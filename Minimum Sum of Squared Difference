@@ -1,20 +1,33 @@
+
 class Solution:
     def minSumSquareDiff(self, nums1: List[int], nums2: List[int], k1: int, k2: int) -> int:
-        import heapq
-
         diff = [abs(a - b) for a, b in zip(nums1, nums2)]
         k = k1 + k2
 
         if sum(diff) <= k:
             return 0
 
-        heap = [-x for x in diff]
-        heapq.heapify(heap)
+        l, r = 0, max(diff)
 
-        while k:
-            x = -heapq.heappop(heap)
-            x -= 1
-            heapq.heappush(heap, -x)
-            k -= 1
+        while l < r:
+            mid = (l + r) // 2
+            need = sum(max(0, x - mid) for x in diff)
 
-        return sum(x * x for x in heap)
+            if need <= k:
+                r = mid
+            else:
+                l = mid + 1
+
+        ans = 0
+        remaining = k
+
+        for x in diff:
+            if x > l:
+                remaining -= x - l
+                x = l
+            ans += x * x
+
+        
+        ans -= remaining * (2 * l - 1)
+
+        return ans
